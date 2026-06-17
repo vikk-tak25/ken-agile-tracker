@@ -16,9 +16,12 @@ const submitButton = document.getElementById("submit-button");
 const cancelEditButton = document.getElementById("cancel-edit-button");
 
 let editingStoryId = null;
+let draggedStoryId = null;
 
 storyForm.addEventListener("submit", handleStorySubmit);
 cancelEditButton.addEventListener("click", cancelEditMode);
+columns.todo.addEventListener("dragover", handleDragOver);
+columns.todo.addEventListener("drop", handleDrop);
 
 async function loadStories() {
     try {
@@ -183,6 +186,98 @@ async function changeStoryStatus(storyId, newStatus) {
     }
 }
 
+function handleDragStart(event) {
+    const card = event.currentTarget;
+
+    if (card.dataset.status !== "todo") {
+        return;
+    }
+
+    draggedStoryId = Number(card.dataset.id);
+    card.classList.add("dragging");
+    event.dataTransfer.effectAllowed = "move";
+}
+
+function handleDragEnd(event) {
+    event.currentTarget.classList.remove("dragging");
+    draggedStoryId = null;
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+
+    const draggingCard = document.querySelector(".dragging");
+
+    if (!draggingCard) {
+        return;
+    }
+
+    const afterElement = getDragAfterElement(columns.todo, event.clientY);
+
+    if (afterElement === null) {
+        columns.todo.appendChild(draggingCard);
+    } else {
+        columns.todo.insertBefore(draggingCard, afterElement);
+    }
+}
+
+async function handleDrop(event) {
+    event.preventDefault();
+
+    const orderedStoryIds = Array.from(columns.todo.querySelectorAll(".story-card"))
+        .map(card => Number(card.dataset.id));
+
+    await saveBacklogOrder(orderedStoryIds);
+}
+
+function getDragAfterElement(container, mouseY) {
+    const draggableCards = Array.from(
+        container.querySelectorAll(".story-card:not(.dragging)")
+    );
+
+    return draggableCards.reduce((closest, card) => {
+        const box = card.getBoundingClientRect();
+        const offset = mouseY - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+            return {
+                offset,
+                element: card
+            };
+        }
+
+        return closest;
+    }, {
+        offset: Number.NEGATIVE_INFINITY,
+        element: null
+    }).element;
+}
+
+async function saveBacklogOrder(storyIds) {
+    try {
+        const response = await fetch("/api/stories/reorder", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                storyIds
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Backlogi järjekorra salvestamine ebaõnnestus.");
+        }
+
+        showFormMessage("Backlogi järjekord salvestati.", "success");
+        loadStories();
+    } catch (error) {
+        showFormMessage(error.message, "error");
+    }
+}
+
 async function startEditMode(storyId) {
     try {
         const response = await fetch(`/api/stories/${storyId}`);
@@ -279,6 +374,14 @@ function renderStories(stories) {
 function createStoryCard(story) {
     const card = document.createElement("article");
     card.className = "story-card";
+    card.dataset.id = story.id;
+card.dataset.status = story.status;
+
+if (story.status === "todo") {
+    card.draggable = true;
+    card.addEventListener("dragstart", handleDragStart);
+    card.addEventListener("dragend", handleDragEnd);
+}
 
     const criteriaItems = story.acceptanceCriteria
         .map(criteria => `<li>${escapeHtml(criteria)}</li>`)
