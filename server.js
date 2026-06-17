@@ -220,6 +220,32 @@ app.patch("/api/stories/:id/status", (req, res) => {
     res.json(story);
 });
 
+app.patch("/api/stories/reorder", (req, res) => {
+    const stories = getStories();
+    const storyIds = req.body.storyIds;
+
+    if (!Array.isArray(storyIds)) {
+        return res.status(400).json({
+            error: "Story ID-de nimekiri peab olema massiiv."
+        });
+    }
+
+    storyIds.forEach((id, index) => {
+        const story = stories.find(item => item.id === Number(id));
+
+        if (story && story.status === "todo") {
+            story.priority = index + 1;
+            story.updatedAt = getCurrentDateTime();
+        }
+    });
+
+    saveStories(stories);
+
+    res.json({
+        message: "Backlogi järjekord salvestati."
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Server töötab aadressil http://localhost:${PORT}`);
 });
