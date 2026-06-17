@@ -3,7 +3,8 @@ const path = require("path");
 const {
     getStories,
     saveStories,
-    getNextStoryId
+    getNextStoryId,
+    getNextCommentId
 } = require("./storyStorage");
 
 const app = express();
@@ -244,6 +245,41 @@ app.patch("/api/stories/reorder", (req, res) => {
     res.json({
         message: "Backlogi järjekord salvestati."
     });
+});
+
+app.post("/api/stories/:id/comments", (req, res) => {
+    const stories = getStories();
+    const storyId = Number(req.params.id);
+    const story = stories.find(item => item.id === storyId);
+
+    if (!story) {
+        return res.status(404).json({
+            error: "Storyt ei leitud."
+        });
+    }
+
+    if (!req.body.text || req.body.text.trim() === "") {
+        return res.status(400).json({
+            error: "Kommentaar ei tohi olla tühi."
+        });
+    }
+
+    if (!Array.isArray(story.comments)) {
+        story.comments = [];
+    }
+
+    const newComment = {
+        id: getNextCommentId(story.comments),
+        text: req.body.text.trim(),
+        createdAt: getCurrentDateTime()
+    };
+
+    story.comments.push(newComment);
+    story.updatedAt = getCurrentDateTime();
+
+    saveStories(stories);
+
+    res.status(201).json(newComment);
 });
 
 app.listen(PORT, () => {
