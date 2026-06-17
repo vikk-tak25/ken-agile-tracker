@@ -4,9 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agile Tracker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Agile Tracker</h1>
-    <p>Kanban-laud storyde haldamiseks.</p>
+    <header>
+        <h1>Agile Tracker</h1>
+        <p>Kanban-laud kasutajalugude haldamiseks.</p>
+    </header>
+
+    <main>
+        <section class="kanban-board">
+            <div class="kanban-column">
+                <h2>Todo / Backlog</h2>
+                <p class="points-total" id="todo-points">Punkte kokku: 0</p>
+                <div id="todo-column" class="story-list"></div>
+            </div>
+
+            <div class="kanban-column">
+                <h2>Doing</h2>
+                <p class="points-total" id="doing-points">Punkte kokku: 0</p>
+                <div id="doing-column" class="story-list"></div>
+            </div>
+
+            <div class="kanban-column">
+                <h2>Done</h2>
+                <p class="points-total" id="done-points">Punkte kokku: 0</p>
+                <div id="done-column" class="story-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
 </body>
 </html>
