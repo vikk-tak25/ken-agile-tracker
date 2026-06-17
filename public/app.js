@@ -219,6 +219,31 @@ async function addComment(storyId) {
     }
 }
 
+async function deleteComment(storyId, commentId) {
+    const confirmed = confirm("Kas oled kindel, et soovid selle kommentaari kustutada?");
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/stories/${storyId}/comments/${commentId}`, {
+            method: "DELETE"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Kommentaari kustutamine ebaõnnestus.");
+        }
+
+        showFormMessage("Kommentaar kustutati.", "success");
+        loadStories();
+    } catch (error) {
+        showFormMessage(error.message, "error");
+    }
+}
+
 function handleDragStart(event) {
     const card = event.currentTarget;
 
@@ -428,6 +453,14 @@ const commentItems = comments.length > 0
             ${escapeHtml(comment.text)}
             <br>
             <small>${escapeHtml(comment.createdAt)}</small>
+            <br>
+            <button
+                type="button"
+                class="small-danger-button"
+                onclick="deleteComment(${story.id}, ${comment.id})"
+            >
+                Kustuta kommentaar
+            </button>
         </li>
     `).join("")
     : "<li>Kommentaare ei ole.</li>";

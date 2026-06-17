@@ -244,3 +244,14 @@ button:hover {
     font-size: 13px;
     padding: 7px 10px;
 }
+
+.small-danger-button {
+    margin-top: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+    background-color: #c62828;
+}
+
+.small-danger-button:hover {
+    background-color: #b71c1c;
+}
