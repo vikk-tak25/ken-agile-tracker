@@ -10,6 +10,11 @@ const pointTotals = {
     done: document.getElementById("done-points")
 };
 
+const storyForm = document.getElementById("story-form");
+const formMessage = document.getElementById("form-message");
+
+storyForm.addEventListener("submit", handleStorySubmit);
+
 async function loadStories() {
     try {
         const response = await fetch("/api/stories");
@@ -23,6 +28,87 @@ async function loadStories() {
     } catch (error) {
         showError(error.message);
     }
+}
+
+async function handleStorySubmit(event) {
+    event.preventDefault();
+
+    const formData = new FormData(storyForm);
+
+    const title = formData.get("title").trim();
+    const description = formData.get("description").trim();
+    const pointsValue = formData.get("points");
+    const acceptanceCriteriaText = formData.get("acceptanceCriteria").trim();
+
+    const acceptanceCriteria = acceptanceCriteriaText
+        .split("\n")
+        .map(criteria => criteria.trim())
+        .filter(criteria => criteria !== "");
+
+    const validationError = validateForm(title, description, pointsValue, acceptanceCriteria);
+
+    if (validationError) {
+        showFormMessage(validationError, "error");
+        return;
+    }
+
+    const newStory = {
+        title,
+        description,
+        points: Number(pointsValue),
+        status: "todo",
+        acceptanceCriteria
+    };
+
+    try {
+        const response = await fetch("/api/stories", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newStory)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Story lisamine ebaõnnestus.");
+        }
+
+        storyForm.reset();
+        showFormMessage("Story lisati edukalt.", "success");
+        loadStories();
+    } catch (error) {
+        showFormMessage(error.message, "error");
+    }
+}
+
+function validateForm(title, description, pointsValue, acceptanceCriteria) {
+    if (title === "") {
+        return "Pealkiri on kohustuslik.";
+    }
+
+    if (description === "") {
+        return "Kirjeldus on kohustuslik.";
+    }
+
+    if (pointsValue === "") {
+        return "Punktid on kohustuslikud.";
+    }
+
+    if (!Number.isInteger(Number(pointsValue))) {
+        return "Punktid peavad olema täisarv.";
+    }
+
+    if (Number(pointsValue) < 0) {
+        return "Punktid ei tohi olla negatiivsed.";
+    }
+
+    if (acceptanceCriteria.length === 0) {
+        return "Lisa vähemalt üks vastuvõtutingimus.";
+    }
+
+    return null;
 }
 
 function renderStories(stories) {
@@ -100,6 +186,11 @@ function showEmptyMessages() {
             column.appendChild(message);
         }
     });
+}
+
+function showFormMessage(message, type) {
+    formMessage.textContent = message;
+    formMessage.className = type === "success" ? "message-success" : "message-error";
 }
 
 function showError(message) {
