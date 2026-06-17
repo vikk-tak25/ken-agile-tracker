@@ -282,6 +282,41 @@ app.post("/api/stories/:id/comments", (req, res) => {
     res.status(201).json(newComment);
 });
 
+app.delete("/api/stories/:storyId/comments/:commentId", (req, res) => {
+    const stories = getStories();
+    const storyId = Number(req.params.storyId);
+    const commentId = Number(req.params.commentId);
+
+    const story = stories.find(item => item.id === storyId);
+
+    if (!story) {
+        return res.status(404).json({
+            error: "Storyt ei leitud."
+        });
+    }
+
+    if (!Array.isArray(story.comments)) {
+        story.comments = [];
+    }
+
+    const commentExists = story.comments.some(comment => comment.id === commentId);
+
+    if (!commentExists) {
+        return res.status(404).json({
+            error: "Kommentaari ei leitud."
+        });
+    }
+
+    story.comments = story.comments.filter(comment => comment.id !== commentId);
+    story.updatedAt = getCurrentDateTime();
+
+    saveStories(stories);
+
+    res.json({
+        message: "Kommentaar kustutati."
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Server töötab aadressil http://localhost:${PORT}`);
 });
