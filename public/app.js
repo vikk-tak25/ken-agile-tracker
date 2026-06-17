@@ -186,6 +186,39 @@ async function changeStoryStatus(storyId, newStatus) {
     }
 }
 
+async function addComment(storyId) {
+    const commentInput = document.getElementById(`comment-${storyId}`);
+    const text = commentInput.value.trim();
+
+    if (text === "") {
+        showFormMessage("Kommentaar ei tohi olla tühi.", "error");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/stories/${storyId}/comments`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                text
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Kommentaari lisamine ebaõnnestus.");
+        }
+
+        showFormMessage("Kommentaar lisati.", "success");
+        loadStories();
+    } catch (error) {
+        showFormMessage(error.message, "error");
+    }
+}
+
 function handleDragStart(event) {
     const card = event.currentTarget;
 
@@ -387,6 +420,18 @@ if (story.status === "todo") {
         .map(criteria => `<li>${escapeHtml(criteria)}</li>`)
         .join("");
 
+        const comments = Array.isArray(story.comments) ? story.comments : [];
+
+const commentItems = comments.length > 0
+    ? comments.map(comment => `
+        <li>
+            ${escapeHtml(comment.text)}
+            <br>
+            <small>${escapeHtml(comment.createdAt)}</small>
+        </li>
+    `).join("")
+    : "<li>Kommentaare ei ole.</li>";
+
     card.innerHTML = `
         <h3>${escapeHtml(story.title)}</h3>
         <p>${escapeHtml(story.description || "")}</p>
@@ -405,6 +450,15 @@ if (story.status === "todo") {
         <ul class="criteria-list">
             ${criteriaItems}
         </ul>
+        <strong>Kommentaarid:</strong>
+        <ul class="comment-list">
+            ${commentItems}
+        </ul>
+
+<div class="comment-form">
+    <textarea id="comment-${story.id}" rows="2" placeholder="Lisa kommentaar"></textarea>
+    <button type="button" onclick="addComment(${story.id})">Lisa kommentaar</button>
+</div>
         <div class="story-actions">
             <button type="button" onclick="startEditMode(${story.id})">Muuda</button>
             <button type="button" class="danger-button" onclick="deleteStory(${story.id})">Kustuta</button>

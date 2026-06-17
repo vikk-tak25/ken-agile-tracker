@@ -218,3 +218,29 @@ button:hover {
 #todo-column {
     min-height: 120px;
 }
+
+.comment-list {
+    padding-left: 20px;
+    margin-top: 8px;
+}
+
+.comment-list li {
+    margin-bottom: 8px;
+}
+
+.comment-list small {
+    color: #666;
+}
+
+.comment-form {
+    margin-top: 10px;
+}
+
+.comment-form textarea {
+    margin-bottom: 8px;
+}
+
+.comment-form button {
+    font-size: 13px;
+    padding: 7px 10px;
+}
