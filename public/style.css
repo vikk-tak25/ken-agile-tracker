@@ -160,3 +160,35 @@ button:hover {
     color: #c62828;
     font-weight: bold;
 }
+
+.story-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.story-actions button {
+    padding: 7px 10px;
+    font-size: 13px;
+}
+
+.secondary-button {
+    background-color: #78909c;
+}
+
+.secondary-button:hover {
+    background-color: #607d8b;
+}
+
+.danger-button {
+    background-color: #c62828;
+}
+
+.danger-button:hover {
+    background-color: #b71c1c;
+}
+
+.hidden {
+    display: none;
+}
