@@ -3,7 +3,7 @@
     "id": 1,
     "title": "Kasutajana tahan lisada uue story, et saaksin tööülesande backlogi panna.",
     "description": "Kasutaja saab luua uue story ja see lisatakse Todo / Backlog veergu.",
-    "status": "todo",
+    "status": "doing",
     "points": 3,
     "priority": 1,
     "acceptanceCriteria": [
@@ -12,7 +12,8 @@
       "Vormis saab sisestada punktid.",
       "Salvestamisel ilmub story Todo / Backlog veergu."
     ],
-    "comments": []
+    "comments": [],
+    "updatedAt": "17.06.2026, 15:20"
   },
   {
     "id": 2,
@@ -34,7 +35,7 @@
     "description": "Story juurde saab lisada kommentaare koos lisamise ajaga.",
     "status": "todo",
     "points": 3,
-    "priority": 2,
+    "priority": 3,
     "acceptanceCriteria": [
       "Kommentaari saab sisestada.",
       "Kommentaari saab salvestada.",
@@ -47,7 +48,8 @@
         "text": "Seda tuleb testida.",
         "createdAt": "2026-05-12 14:32"
       }
-    ]
+    ],
+    "updatedAt": "17.06.2026, 17:31"
   },
   {
     "id": 4,
@@ -55,12 +57,42 @@
     "description": "Todo / Backlog veerus saab story'sid hiirega ümber tõsta.",
     "status": "todo",
     "points": 8,
-    "priority": 3,
+    "priority": 2,
     "acceptanceCriteria": [
       "Backlogis olevaid story'sid saab hiirega lohistada.",
       "Uus järjekord salvestatakse.",
       "Pärast lehe uuendamist jääb järjekord samaks."
     ],
-    "comments": []
+    "comments": [],
+    "updatedAt": "17.06.2026, 17:31"
+  },
+  {
+    "id": 5,
+    "title": "Test story",
+    "description": "test, test, 1 2 3!",
+    "status": "todo",
+    "points": 2,
+    "priority": 1,
+    "acceptanceCriteria": [
+      "Story lisatakse backlogi.",
+      "Story kuvatakse pärast salvestamist."
+    ],
+    "comments": [],
+    "createdAt": "17.06.2026, 14:34",
+    "updatedAt": "17.06.2026, 17:32"
+  },
+  {
+    "id": 8,
+    "title": "Puuhobune",
+    "description": "kiigub",
+    "status": "done",
+    "points": 4,
+    "priority": 7,
+    "acceptanceCriteria": [
+      "jala peal"
+    ],
+    "comments": [],
+    "createdAt": "17.06.2026, 14:52",
+    "updatedAt": "17.06.2026, 17:28"
   }
 ]
