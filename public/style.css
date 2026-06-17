@@ -206,3 +206,15 @@ button:hover {
     width: auto;
     padding: 5px;
 }
+
+.story-card[draggable="true"] {
+    cursor: grab;
+}
+
+.story-card.dragging {
+    opacity: 0.5;
+}
+
+#todo-column {
+    min-height: 120px;
+}
