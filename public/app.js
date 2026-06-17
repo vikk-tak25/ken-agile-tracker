@@ -12,8 +12,13 @@ const pointTotals = {
 
 const storyForm = document.getElementById("story-form");
 const formMessage = document.getElementById("form-message");
+const submitButton = document.getElementById("submit-button");
+const cancelEditButton = document.getElementById("cancel-edit-button");
+
+let editingStoryId = null;
 
 storyForm.addEventListener("submit", handleStorySubmit);
+cancelEditButton.addEventListener("click", cancelEditMode);
 
 async function loadStories() {
     try {
@@ -52,7 +57,7 @@ async function handleStorySubmit(event) {
         return;
     }
 
-    const newStory = {
+    const storyData = {
         title,
         description,
         points: Number(pointsValue),
@@ -60,13 +65,21 @@ async function handleStorySubmit(event) {
         acceptanceCriteria
     };
 
+    if (editingStoryId) {
+        await updateStory(editingStoryId, storyData);
+    } else {
+        await createStory(storyData);
+    }
+}
+
+async function createStory(storyData) {
     try {
         const response = await fetch("/api/stories", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(newStory)
+            body: JSON.stringify(storyData)
         });
 
         const data = await response.json();
@@ -81,6 +94,103 @@ async function handleStorySubmit(event) {
     } catch (error) {
         showFormMessage(error.message, "error");
     }
+}
+
+async function updateStory(storyId, storyData) {
+    try {
+        const oldResponse = await fetch(`/api/stories/${storyId}`);
+        const oldStory = await oldResponse.json();
+
+        if (!oldResponse.ok) {
+            throw new Error(oldStory.error || "Story andmete laadimine ebaõnnestus.");
+        }
+
+        const updatedStory = {
+            ...storyData,
+            status: oldStory.status,
+            priority: oldStory.priority
+        };
+
+        const response = await fetch(`/api/stories/${storyId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedStory)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Story muutmine ebaõnnestus.");
+        }
+
+        cancelEditMode();
+        showFormMessage("Story muudeti edukalt.", "success");
+        loadStories();
+    } catch (error) {
+        showFormMessage(error.message, "error");
+    }
+}
+
+async function deleteStory(storyId) {
+    const confirmed = confirm("Kas oled kindel, et soovid selle story kustutada?");
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/stories/${storyId}`, {
+            method: "DELETE"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Story kustutamine ebaõnnestus.");
+        }
+
+        showFormMessage("Story kustutati.", "success");
+        loadStories();
+    } catch (error) {
+        showFormMessage(error.message, "error");
+    }
+}
+
+async function startEditMode(storyId) {
+    try {
+        const response = await fetch(`/api/stories/${storyId}`);
+        const story = await response.json();
+
+        if (!response.ok) {
+            throw new Error(story.error || "Story andmete laadimine ebaõnnestus.");
+        }
+
+        editingStoryId = story.id;
+
+        storyForm.elements.title.value = story.title;
+        storyForm.elements.description.value = story.description;
+        storyForm.elements.points.value = story.points;
+        storyForm.elements.acceptanceCriteria.value = story.acceptanceCriteria.join("\n");
+
+        submitButton.textContent = "Salvesta muudatused";
+        cancelEditButton.classList.remove("hidden");
+
+        showFormMessage(`Muudad storyt ID-ga ${story.id}.`, "success");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        showFormMessage(error.message, "error");
+    }
+}
+
+function cancelEditMode() {
+    editingStoryId = null;
+    storyForm.reset();
+    submitButton.textContent = "Lisa story";
+    cancelEditButton.classList.add("hidden");
+    formMessage.textContent = "";
+    formMessage.className = "";
 }
 
 function validateForm(title, description, pointsValue, acceptanceCriteria) {
@@ -160,6 +270,10 @@ function createStoryCard(story) {
         <ul class="criteria-list">
             ${criteriaItems}
         </ul>
+        <div class="story-actions">
+            <button type="button" onclick="startEditMode(${story.id})">Muuda</button>
+            <button type="button" class="danger-button" onclick="deleteStory(${story.id})">Kustuta</button>
+        </div>
     `;
 
     return card;
