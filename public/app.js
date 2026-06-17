@@ -158,6 +158,31 @@ async function deleteStory(storyId) {
     }
 }
 
+async function changeStoryStatus(storyId, newStatus) {
+    try {
+        const response = await fetch(`/api/stories/${storyId}/status`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                status: newStatus
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Staatuse muutmine ebaõnnestus.");
+        }
+
+        showFormMessage("Story staatus muudeti.", "success");
+        loadStories();
+    } catch (error) {
+        showFormMessage(error.message, "error");
+    }
+}
+
 async function startEditMode(storyId) {
     try {
         const response = await fetch(`/api/stories/${storyId}`);
@@ -263,7 +288,14 @@ function createStoryCard(story) {
         <h3>${escapeHtml(story.title)}</h3>
         <p>${escapeHtml(story.description || "")}</p>
         <p class="story-meta">ID: ${story.id}</p>
-        <p class="story-meta">Staatus: ${story.status}</p>
+        <div class="status-control">
+    <label for="status-${story.id}">Staatus:</label>
+    <select id="status-${story.id}" onchange="changeStoryStatus(${story.id}, this.value)">
+        <option value="todo" ${story.status === "todo" ? "selected" : ""}>Todo</option>
+        <option value="doing" ${story.status === "doing" ? "selected" : ""}>Doing</option>
+        <option value="done" ${story.status === "done" ? "selected" : ""}>Done</option>
+    </select>
+</div>
         <p class="story-meta">Punktid: ${story.points}</p>
         <p class="story-meta">Prioriteet: ${story.priority}</p>
         <strong>Vastuvõtutingimused:</strong>

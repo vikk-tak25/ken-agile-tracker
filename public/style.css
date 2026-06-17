@@ -192,3 +192,17 @@ button:hover {
 .hidden {
     display: none;
 }
+
+.status-control {
+    margin: 8px 0;
+}
+
+.status-control label {
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.status-control select {
+    width: auto;
+    padding: 5px;
+}
