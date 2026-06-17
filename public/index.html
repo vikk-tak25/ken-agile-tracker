@@ -13,6 +13,41 @@
     </header>
 
     <main>
+        <section class="form-section">
+            <h2>Lisa uus story</h2>
+
+            <form id="story-form">
+                <div class="form-group">
+                    <label for="title">Pealkiri</label>
+                    <input type="text" id="title" name="title">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Kirjeldus</label>
+                    <textarea id="description" name="description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="points">Punktid</label>
+                    <input type="number" id="points" name="points" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="acceptanceCriteria">Vastuvõtutingimused</label>
+                    <textarea
+                        id="acceptanceCriteria"
+                        name="acceptanceCriteria"
+                        rows="4"
+                        placeholder="Kirjuta iga vastuvõtutingimus eraldi reale"
+                    ></textarea>
+                </div>
+
+                <button type="submit">Lisa story</button>
+            </form>
+
+            <p id="form-message"></p>
+        </section>
+
         <section class="kanban-board">
             <div class="kanban-column">
                 <h2>Todo / Backlog</h2>

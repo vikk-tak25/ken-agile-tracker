@@ -104,3 +104,59 @@ main {
         grid-template-columns: 1fr;
     }
 }
+
+.form-section {
+    background-color: white;
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.form-section h2 {
+    margin-top: 0;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+input,
+textarea {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #263238;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #37474f;
+}
+
+.message-success {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.message-error {
+    color: #c62828;
+    font-weight: bold;
+}
