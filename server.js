@@ -29,6 +29,10 @@ function validateStoryInput(story) {
         return "Pealkiri on kohustuslik.";
     }
 
+    if (!story.description || story.description.trim() === "") {
+        return "Kirjeldus on kohustuslik.";
+    }
+
     if (story.points === undefined || story.points === null || story.points === "") {
         return "Punktid on kohustuslikud.";
     }
@@ -187,6 +191,33 @@ app.delete("/api/stories/:id", (req, res) => {
     res.json({
         message: "Story kustutati."
     });
+});
+
+app.patch("/api/stories/:id/status", (req, res) => {
+    const stories = getStories();
+    const storyId = Number(req.params.id);
+    const story = stories.find(item => item.id === storyId);
+
+    if (!story) {
+        return res.status(404).json({
+            error: "Storyt ei leitud."
+        });
+    }
+
+    const newStatus = req.body.status;
+
+    if (!["todo", "doing", "done"].includes(newStatus)) {
+        return res.status(400).json({
+            error: "Staatus peab olema todo, doing või done."
+        });
+    }
+
+    story.status = newStatus;
+    story.updatedAt = getCurrentDateTime();
+
+    saveStories(stories);
+
+    res.json(story);
 });
 
 app.listen(PORT, () => {
